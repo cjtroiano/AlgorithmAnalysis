@@ -1,0 +1,334 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage,amsthm,amsfonts,amssymb,epsfig,amsmath}
+
+\begin{document}
+
+\begin{center}
+{\bf\large HW2 - S16}\\
+\hfill Chris Troiano - ctroiano \hfill 4-12 \\
+\end{center}
+
+\begin{enumerate}
+\item Design 3 algorithms based on binary min-heaps (and/or max-heaps) that find the $k$th smallest \# out of a set of $n$ \#'s in time:
+\begin{enumerate}
+\item[a)] $O(n \log k)$
+\item[b)] $O(n + k \log n)$
+\item[c)] $O(n + k \log k)$
+\end{enumerate}
+
+Use the heap operations (here $s$ is the size):
+\begin{itemize}
+\item   Insert, delete: $O(\log s)$
+\item   Buildheap: $O(s)$
+\item   Smallest: $O(1)$
+\end{itemize}
+  
+Give high level descriptions of the 3 algorithms and briefly reason correctness and running time. Part c) is the most challenging.
+
+\textbf{Solution:}
+\item[a)]
+\begin{verbatim}
+negate every element in array A[]
+buildheap (k)
+x = k+1
+while x <= n
+	if (smallest () < A[x])
+		delete (smallest ())
+        insert (A[x])
+    x++
+negate every element in array A[] to get back to positive values
+return smallest ()
+\end{verbatim}
+We build the heap in $O(k)$ time and then iterate through the array $(n - (k+1))$ times to compare the heap and $(n - (k+1))$ elements of the array. During comparing we use $2 \log k$ functions, giving us in total an $O(n \log k)$. 
+
+\item[b)]
+\begin{verbatim}
+buildheap (n)
+x = 0
+while x <= k-1
+	delete (smallest ())
+    x++
+return smallest ()
+\end{verbatim}
+We build the heap in $O(n)$ time and then iterate through the array k times to find the kth smallest element. In the loop, delete is called for a time of $O(\log n)$. This gives us an algorithm with $O(n + k \log n)$.
+\item[c)]
+\begin{verbatim}
+buildheap (n)
+insert (smallest ()) into a new heap
+for every element <= kth element
+	if element == k
+    	return element
+    else insert the children of the extracted element into new array
+\end{verbatim}
+We build the heap in $O(n)$ time. We then insert the smallest element into a new array which only takes $O(1)$. We then iterate through the original heap k times, if the k element isn't found, we insert the children of inspected element into the new array, which takes $O(k \log k)$
+\vspace*{.2cm}
+
+\item Consider the following sorting algorithm for an array of numbers (Assume the size $n$ of the array is divisible by $3$):
+\begin{itemize}
+\item   Sort the initial 2/3 of the array.
+\item   Sort the final 2/3 and then again the initial 2/3.
+\end{itemize}
+
+Reason that this algorithm properly sorts the array. What is its running time?
+
+\textbf{Solution:}
+Induction proof based on size of array $l$\\
+\textbf{base:} when \emph{l} $\leq$ 3, the algorithm trivially sorts the array\\
+\textbf{Inductive Hypotesis:} let $l$ \textgreater $3$ and assume 2/3 sort, sorts all arrays of size \textless $l$. The algorithm makes $3$ recursive calls.\\
+
+1. sort inital 2/3\\
+2. sort last 2/3\\
+3. sort inital 2/3\\
+
+For convenience, call the 1st, 2nd, and 3rd parts of the array [A, B, C]\\
+
+1. After 1st recursive call, A \& B are sorted; B's elements are greater than or equal to A's, by inductive hypothesis.\\
+2. After 2nd recursive call, B \& C are sorted; C's elements are the largest in the array, and we are done sorting C\\
+3. The last pass guarantees A \& B's elements are sorted. Therefore, the array is sorted in increasing order.
+
+By Master Theorem:\\
+$T(n) = 3T(\frac{n}{2/3}) + O(1)$\\
+$n^{\log_\frac{3}{2} 3} \approx n^{2.7} \textgreater 1 \Rightarrow \Theta(n^{\log_\frac{3}{2} 3})$
+
+\vspace*{.2cm}
+
+\item KT, problem 1, p 246.
+
+\vspace*{.2cm}
+\textbf{Solution:}
+The median can be solved recursively with databases A \& B.\\
+First find median of both A \& B.\\
+$A^* = \frac{n}{2} smallest \hspace{4cm} B^* = \frac{n}{2} smallest$
+\begin{itemize}
+\item $A^* > B^*$, the elements in $A[\frac{n}{2}...n] > B^*$, so we can throw them away. The median cannot lie in $B[1...\frac{n}{2}]$ either, so we can throw that away too. We can now recursively solve a subproblem with $A[1...\frac{n}{2}] \& B[\frac{n}{2}...n].$
+
+\item $A^* < B^*$, we can throw away $B[\frac{n}{2}...n] \& A[1...\frac{n}{2}]$. We can now recursively solve a subproblem with $A[\frac{n}{2}...n] \& B[1...\frac{n}{2}$.
+\end{itemize}
+
+In both cases, the subproblem reduces by a factor of $\frac{1}{2}$ and we spend constant time comparing the two. This gives us the recurrence relation $T(n) = T(\frac{n}{2}) + O(1)$.\\
+By Master Theorem:\\
+$n^{log_21} = n^0 = O(1)$\\
+Therefore $T(n) = \Theta(n^0 \log n) = \Theta(\log n)$
+
+\item Suppose you are choosing between the following 3 algorithms:
+\begin{enumerate}
+\item Algorithm $A$ solves problems by dividing them into 5 subproblems of half the size, recursively solving each subproblem, and then combining the solutions in linear time.
+\item Algorithm $B$ solves problems of size n by recursively solving 2 subproblems of size $n-1$ and the combining the solutions in constant time.
+\item Algorithm $C$ solves problems of size $n$ by dividing them into nine subproblems of size $n/3$, recursively solving each subproblem, and the combining the solution in $O(n^2)$ time.
+\end{enumerate}
+
+What are the running times of each of these algs. (in big-O notation), and which would you choose?
+
+\vspace*{.2cm}
+\textbf{Solution:}
+\begin{enumerate}
+
+\item $T(n) = 5T(\frac{n}{2}) + O(1)$\\
+\hspace{1cm} By Master Theorem:\\
+\hspace{1cm} $n^{\log_2 5} > n$, so $T(n) = \Theta(n^{\log_2 5})$
+
+\item $T(n) = 2T(n-1) + O(1)$\\
+\hspace{1cm} By Substitution:\\
+\hspace{1cm} $n = 1: T(1) = 1$\\
+\hspace{1cm} $n = 2: T(2) = 1 + (2 + 1) = 4$\\
+\hspace{1cm} $n = 3: T(3) = 1 + 3 + (4 + 1) = 9$\\
+\hspace{1cm} $n = 4: T(4) = 1 + 3 + 5 + (6 + 1) = 16$\\
+\hspace{1cm} We can tell that this runs in $O(2^n)$.
+
+\item $T(n) = 9T(\frac{n}{3}) + O(n^2)$\\
+\hspace{1cm} By Master Theorem:\\
+\hspace{1cm} $n^{\log_3 9} = n^2$, so $T(n) = \Theta(n^{\log_3 9} log n) = \Theta(n^2 log n)$
+
+\end{enumerate}
+
+\item
+\begin{enumerate}
+\item
+Compute the FFT of the polynomial $1+2x-x^3$ by computing
+the 4 dimensional FFT matrix and multiplying it with the
+coefficient vector $[1\; 2\; 0\; -\!1]^\top$.
+
+The FFT matrix uses powers of a root of unity.
+First determine the appropriate root of unity.
+\item
+Now compute the inverse FFT of the vector $[1\; 2\; 0\; -\!1]^\top$.
+Again find the appropriate matrix and multiply this matrix
+by the vector.
+\item
+Check that the two matrices used above are inverses of each
+other.
+\end{enumerate}
+\textbf{Solution:}
+
+\begin{enumerate}
+\item $n^{th}$ root $= \omega = e^{\frac{2\pi i}{4}} = e^{\frac{\pi i}{2}} = \cos(\frac{\pi i}{2}) + i\sin(\frac{\pi i}{2}) = i$ \\
+
+\begin{displaymath}
+$$
+$
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+1 & \omega & \omega^2 & \omega^3 \\
+1 & \omega^2 & \omega^4 & \omega^6 \\
+1 & \omega^3 & \omega^6 & \omega^9 \\
+\end{bmatrix}
+$
+$\Rightarrow$
+$
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+1 & i & -1 & -i \\
+1 & -1 & 1 & -1 \\
+1 & -i & -1 & i \\
+\end{bmatrix}
+$
+$\times$
+$
+\begin{bmatrix}
+1 \\
+2 \\
+0 \\
+-1 \\
+\end{bmatrix}
+$
+$=$
+$
+\begin{bmatrix}
+2 \\
+1 + 3i \\
+0 \\
+-2i \\
+\end{bmatrix}
+$
+$$
+\end{displaymath}
+
+\item
+\begin{displaymath}
+$$
+$\frac{1}{4}$
+$
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+1 & \omega & \omega^2 & \omega^3 \\
+1 & \omega^2 & \omega^4 & \omega^6 \\
+1 & \omega^3 & \omega^6 & \omega^9 \\
+\end{bmatrix}^{-1}
+$
+$\Rightarrow$
+$
+\begin{bmatrix}
+\frac{1}{4} & \frac{1}{4} & \frac{1}{4} & \frac{1}{4} \\
+\frac{1}{4} & -\frac{1}{4}i & -\frac{1}{4} & \frac{1}{4}i \\
+\frac{1}{4} & -\frac{1}{4} & \frac{1}{4} & -\frac{1}{4} \\
+\frac{1}{4} & \frac{1}{4}i & -\frac{1}{4} & -\frac{1}{4}i \\
+\end{bmatrix}
+$
+$\times$
+$
+\begin{bmatrix}
+1 \\
+2 \\
+0 \\
+-1 \\
+\end{bmatrix}
+$
+$=$
+$
+\begin{bmatrix}
+\frac{1}{2} \\
+\frac{1}{4} - \frac{3}{4}i \\
+0 \\
+\frac{1}{4} + \frac{3}{4}i \\
+\end{bmatrix}
+$
+$$
+\end{displaymath}
+
+\item
+\begin{displaymath}
+$$
+$
+\begin{bmatrix}
+1 & 1 & 1 & 1 \\
+1 & i & -1 & -i \\
+1 & -1 & 1 & -1 \\
+1 & -i & -1 & i \\
+\end{bmatrix}
+$
+$\times$
+$
+\begin{bmatrix}
+\frac{1}{4} & \frac{1}{4} & \frac{1}{4} & \frac{1}{4} \\
+\frac{1}{4} & -\frac{1}{4}i & -\frac{1}{4} & \frac{1}{4}i \\
+\frac{1}{4} & -\frac{1}{4} & \frac{1}{4} & -\frac{1}{4} \\
+\frac{1}{4} & \frac{1}{4}i & -\frac{1}{4} & -\frac{1}{4}i \\
+\end{bmatrix}
+$
+$=$
+$
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1 \\
+\end{bmatrix}
+$
+$$
+\end{displaymath}
+
+\end{enumerate}
+
+\item \textbf{(Extra Credit)} The square of a matrix $A$ is its product with itself, $A A$.
+
+\begin{enumerate}
+\item Show that 5 multiplications are sufficient to compute the square of a $2 \times 2$ matrix.
+\item What is wrong with the following algorithm for computing the square of an $n \times n$ matrix.\\
+``Use a divide-and-conquer approach as in Strassen's algorithm, except that instead of getting 7 subproblems of size $n/2$, we now get 5 subproblems of size $n/2$ thanks to part a). Using the same analysis as in Strassen's algorithm we can conclude that the algorithm runs in time $O(n^{\log_2 5})$.''
+\item In fact, squaring matrices is no easier that matrix multiplication. Show that if $n \times n$ matrices can be squared in time $O(n^c)$, then any two $n \times n$ matrices can be multiplied in time $O(n^c)$.
+\end{enumerate}
+
+\textbf{Solution:}
+\begin{enumerate}
+\item
+\begin{displaymath}
+$$
+$
+\begin{bmatrix}
+a & b \\
+c & d \\
+\end{bmatrix}
+$
+$\times$
+$
+\begin{bmatrix}
+a & b \\
+c & d \\
+\end{bmatrix}
+$
+$=$
+$
+\begin{bmatrix}
+a^2 + bc & ab + bd \\
+ca + cd & cb + d^2 \\
+\end{bmatrix} \\
+$
+
+1. $a^2$ \\
+2. $d^2$ \\
+3. $b(a + d)$ \\
+4. $c(a + d)$ \\
+5. $cb$ \\
+$$
+\end{displaymath}
+
+\item We cannot use the solution for a). The reason that we were able to use 5 multiplications was becuase we were squaring two matrices. This will not work for Strassen's algorithm because we are not guaranteed that the subproblem will multiply 2 identical matrices.
+
+\item When multiplying two $n \times n$ matricies, the resulting output contains $n^2$ elements. When evalutaing the $n^2$ elements, we will need n operations. This results in time complexity $n*n^2 = n^3 \Rightarrow O(n^c)$
+
+\end{enumerate}
+
+\end{enumerate}
+
+
+\end{document}
